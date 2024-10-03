@@ -116,7 +116,7 @@ const TeacherForm = ({
 
             </div>
 
-            {/* <div className="flex flex-col gap-2 w-full md:w-1/4 justify-center">
+            { <div className="flex flex-col gap-2 w-full md:w-1/4 justify-center">
           <label
             className="text-xs text-gray-500 flex items-center gap-2 cursor-pointer"
             htmlFor="img"
@@ -130,7 +130,7 @@ const TeacherForm = ({
               {errors.img.message.toString()}
             </p>
           )}
-        </div> */}
+        </div> }
                 </div>
             <button className="bg-blue-400 text-white p-2 rounded-md ">{type === "create" ? "Create" : "Update"}</button>
         </form>
