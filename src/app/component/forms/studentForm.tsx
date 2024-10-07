@@ -6,15 +6,18 @@ import { z } from "zod";
 import InputField from "../comp/inputField";
 import Image from "next/image";
 import { StudentSchema, studentSchema } from "@/lib/formValidationSchemas";
+import { Dispatch, SetStateAction } from "react";
 
 
 
 const StudentForm = ({
     type,
     data,
+    setOpen
 }: {
     type: "create" | "update";
     data?: any;
+    setOpen:Dispatch<SetStateAction<boolean>>
 }) => {
     const {
         register,

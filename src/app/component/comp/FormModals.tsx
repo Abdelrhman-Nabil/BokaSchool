@@ -1,48 +1,51 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
-import TeacherForm from "../forms/teacherForm";
-import StudentForm from "../forms/studentForm";
-import ParentForm from "../forms/parentForm";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import SubjectForm from "../forms/subjectForm";
-import ExamForm from "../forms/examForm";
-import AssignmentForm from "../forms/assignmentForm";
-import ClassForm from "../forms/classForm";
+import { FormContaierProps } from "./formContianer";
+import { deleteSubject } from "@/lib/actions";
+import { useFormState } from "react-dom";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+
+
+const deleteActionMap:any = {
+  subject: deleteSubject,
+//   class: deleteClass,
+//   teacher: deleteTeacher,
+//   student: deleteStudent,
+//   exam: deleteExam,
+// // TODO: OTHER DELETE ACTIONS
+//   parent: deleteSubject,
+//   lesson: deleteSubject,
+//   assignment: deleteSubject,
+//   result: deleteSubject,
+//   attendance: deleteSubject,
+//   event: deleteSubject,
+//   announcement: deleteSubject,
+};
 
 const Forms:{
-  [key:string]:(type:"create" | "update" ,data:any)=>JSX.Element
+  [key:string]:(setOpen:Dispatch<SetStateAction<boolean>>,type:"create" | "update" ,data:any ,relatedData?: any)=>JSX.Element
 }={
-  teacher:(type,data)=><TeacherForm type={type} data={data}/>,
-  student:(type,data)=><StudentForm type={type} data={data}/>,
-  parent:(type,data)=><ParentForm type={type} data={data}/>,
-  subject:(type,data)=><SubjectForm type={type} data={data}/>,
-  exam:(type,data)=><ExamForm type={type} data={data}/>,
-  assignment:(type,data)=><AssignmentForm type={type} data={data}/>,
-  class:(type,data)=><ClassForm type={type} data={data}/>
+  
+  subject: (setOpen,type, data, relatedData) => 
+    <SubjectForm
+      setOpen={setOpen}
+      type={type}
+      data={data}
+      relatedData={relatedData}
+    />
+
 }
 const FormModal = ({
   table,
   type,
   data,
   id,
-}: {
-  table:
-  | "teacher"
-  | "student"
-  | "parent"
-  | "subject"
-  | "class"
-  | "lesson"
-  | "exam"
-  | "assignment"
-  | "result"
-  | "attendance"
-  | "event"
-  | "announcement";
-  type: "create" | "update" | "delete";
-  data?: any;
-  id?: number | string;
-}) => {
+  relatedData
+}:FormContaierProps & {relatedData:any}) => {
+
   const size = type === "create" ? "w-8 h-8" : "w-7 h-7";
   const bgColor =
     type === "create"
@@ -54,17 +57,35 @@ const FormModal = ({
   const [open, setOpen] = useState(false)
 
    const Form=()=>{
+    const [state, formAction] = useFormState(deleteActionMap[table], {
+      success: false,
+      error: false,
+    });
+
+    const router = useRouter();
+
+    useEffect(() => {
+      if (state.success) {
+        toast(`${table} has been deleted!`);
+        setOpen(false);
+        router.refresh();
+      }
+    }, [state, router])
     return type ==="delete" && id?(
-      <form action="" className="p-4 flex flex-col gap-4">
+      <form action={formAction} className="p-4 flex flex-col gap-4">
+        <input type="text | number" name="id" value={id} hidden />
       <span className="text-center font-medium">
         All data will be lost. Are you sure you want to delete this {table}?
       </span>
       <button className="bg-red-700 text-white py-2 px-4 rounded-md border-none w-max self-center">
         Delete
       </button>
+      {state.error && (
+        <span className="text-red-500">Something went wrong!</span>
+      )}
     </form>
   ):type ==="create" ||type ==="update"?(
-    Forms[table](type,data)
+    Forms[table](setOpen,type,data,relatedData)
   ):("form not found") 
    }
   return (
@@ -91,3 +112,7 @@ const FormModal = ({
 };
 
 export default FormModal;
+function setOpen(value: SetStateAction<boolean>): void {
+  throw new Error("Function not implemented.");
+}
+

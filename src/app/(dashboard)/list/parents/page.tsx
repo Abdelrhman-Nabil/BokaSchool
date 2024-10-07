@@ -2,7 +2,7 @@ import FormModal from "@/app/component/comp/FormModals";
 import Pagination from "@/app/component/comp/Pagination";
 import Table from "@/app/component/comp/Table";
 import TableSearch from "@/app/component/comp/TableSearch";
-import { role, parentsData } from "@/lib/data";
+import { role} from "@/lib/utils";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Parent ,Prisma,Student} from "@prisma/client";
@@ -86,8 +86,7 @@ const ParnetsListPage =
       if (value !== undefined) {
         switch (key) {
           case "search":
-            query.name = { contains: value, mode: "insensitive" },
-            
+            query.name = { contains: value, mode: "insensitive" };
             break;
           default:
             break;

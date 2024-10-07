@@ -2,7 +2,7 @@ import FormModal from "@/app/component/comp/FormModals";
 import Pagination from "@/app/component/comp/Pagination";
 import Table from "@/app/component/comp/Table";
 import TableSearch from "@/app/component/comp/TableSearch";
-import { role} from "@/lib/data";
+import { role} from "@/lib/utils";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Class, Prisma, Subject, Teacher } from "@prisma/client";
@@ -43,12 +43,14 @@ const columns = [
     accessor: "address",
     className: "hidden lg:table-cell",
   },
-  {
-    header: "Actions",
-    accessor: "action",
-    className: "",
-
-  },
+  ...(role === "admin"
+    ? [
+      {
+        header: "Actions",
+        accessor: "action",
+      },
+    ]
+    : []),
 ];
 const renderRow = (item:teacherList) => (
   <tr
@@ -128,7 +130,6 @@ const TeacherListPage =  async ({searchParams}:
     }),
     prisma.teacher.count({where:quary}),
   ]);
-     console.log(data)
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
       {/* TOP */}
