@@ -1,8 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
 
-const {userId,sessionClaims } = auth();
-export const role = (sessionClaims?.metadata as { role?: string })?.role;
-export const currnetUserId=userId;
 
 export const getLatestMonday = (): Date => {
     const today = new Date();

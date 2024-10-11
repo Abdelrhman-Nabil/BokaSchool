@@ -1,12 +1,12 @@
-import FormModal from "@/app/component/comp/FormModals";
+import FormContianer from "@/app/component/comp/formContianer";
 import Pagination from "@/app/component/comp/Pagination";
 import Table from "@/app/component/comp/Table";
 import TableSearch from "@/app/component/comp/TableSearch";
-import { currnetUserId, role } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Prisma } from "@prisma/client";
 import Image from "next/image";
+import { auth } from "@clerk/nextjs/server";
 
 type resultsList = {
   id: number,
@@ -22,84 +22,87 @@ type resultsList = {
 
 };
 
-const columns = [
-  {
-    header: "Title",
-    accessor: "title",
-    className: "",
 
-  },
-  {
-    header: "Student",
-    accessor: "student",
-    className: "hidden md:table-cell",
-  },
-
-  {
-    header: "Score",
-    accessor: "score",
-    className: "hidden lg:table-cell",
-  },
-  {
-    header: "Teacher",
-    accessor: "teacher",
-    className: "hidden lg:table-cell",
-  },
-  {
-    header: "class",
-    accessor: " class",
-    className: "hidden lg:table-cell",
-  },
-  {
-    header: "Date",
-    accessor: "date",
-    className: "hidden lg:table-cell",
-  },
-
-  ...(role === "admin" || role === "teacher"
-    ? [
-      {
-        header: "Actions",
-        accessor: "action",
-      },
-    ]
-    : []),
-];
-const renderRow = (item: resultsList) => (
-  <tr
-    key={item.id}
-    className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-[#F1F0FF]"
-  >
-    <td className="flex items-center gap-4 p-4">
-      <div className="flex flex-col">
-        <h3 className="font-semibold">{item.title}</h3>
-      </div>
-    </td>
-    <td className="hidden md:table-cell">{item.studentName + " " + item.studentSurname}</td>
-    <td className="hidden md:table-cell">{item.score}</td>
-    <td className="hidden md:table-cell">{item.teacherName + " " + item.teacherSurname}</td>
-    <td className="hidden md:table-cell">{item.className}</td>
-    {new Intl.DateTimeFormat("en-US").format(item.startTime)}
-    <td>
-      <div className="flex items-center gap-2">
-        {role === "admin" && (
-          <>
-            <FormModal table="result" type="update" data={item} />
-            <FormModal table="result" type="delete" id={item.id} />
-          </>
-        )}
-      </div>
-    </td>
-  </tr>
-);
 const ReusltListPage = async ({
   searchParams,
 }: {
   searchParams: { [key: string]: string | undefined };
 }) => {
 
+  const {userId,sessionClaims } = auth();
+  const role = (sessionClaims?.metadata as { role?: string })?.role;
+  const currnetUserId=userId!;
 
-
+  const columns = [
+    {
+      header: "Title",
+      accessor: "title",
+      className: "",
+  
+    },
+    {
+      header: "Student",
+      accessor: "student",
+      className: "hidden md:table-cell",
+    },
+  
+    {
+      header: "Score",
+      accessor: "score",
+      className: "hidden lg:table-cell",
+    },
+    {
+      header: "Teacher",
+      accessor: "teacher",
+      className: "hidden lg:table-cell",
+    },
+    {
+      header: "class",
+      accessor: " class",
+      className: "hidden lg:table-cell",
+    },
+    {
+      header: "Date",
+      accessor: "date",
+      className: "hidden lg:table-cell",
+    },
+  
+    ...(role === "admin" || role === "teacher"
+      ? [
+        {
+          header: "Actions",
+          accessor: "action",
+        },
+      ]
+      : []),
+  ];
+  const renderRow = (item: resultsList) => (
+    <tr
+      key={item.id}
+      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-[#F1F0FF]"
+    >
+      <td className="flex items-center gap-4 p-4">
+        <div className="flex flex-col">
+          <h3 className="font-semibold">{item.title}</h3>
+        </div>
+      </td>
+      <td className="hidden md:table-cell">{item.studentName + " " + item.studentSurname}</td>
+      <td className="hidden md:table-cell">{item.score}</td>
+      <td className="hidden md:table-cell">{item.teacherName + " " + item.teacherSurname}</td>
+      <td className="hidden md:table-cell">{item.className}</td>
+      {new Intl.DateTimeFormat("en-US").format(item.startTime)}
+      <td>
+        <div className="flex items-center gap-2">
+          {role === "admin" && (
+            <>
+              <FormContianer table="result" type="update" data={item} />
+              <FormContianer table="result" type="delete" id={item.id} />
+            </>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
 
   const { page, ...queryParams } = searchParams;
 
@@ -217,7 +220,7 @@ const ReusltListPage = async ({
             </button>
             {role === "admin" && (
 
-              <FormModal table="result" type="create" />
+              <FormContianer table="result" type="create" />
             )}
           </div>
         </div>

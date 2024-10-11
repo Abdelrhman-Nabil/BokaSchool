@@ -1,4 +1,4 @@
-import FormModal from "@/app/component/comp/FormModals";
+import FormContaier from "@/app/component/comp/formContianer";
 import Pagination from "@/app/component/comp/Pagination";
 import Table from "@/app/component/comp/Table";
 import TableSearch from "@/app/component/comp/TableSearch";
@@ -7,76 +7,75 @@ import { ITEM_PER_PAGE } from "@/lib/settings";
 import { auth } from "@clerk/nextjs/server";
 import { Announcement, Class, Prisma } from "@prisma/client";
 import Image from "next/image";
-import { currnetUserId, role } from "@/lib/utils";
 type announcementList=Announcement & {class:Class}
 
  
-const renderRow = (item: announcementList) => (
-  <tr
-    key={item.id}
-    className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-[#F1F0FF]"
-  >
-    <td className="flex items-center gap-4 p-4">
-      <div className="flex flex-col">
-        <h3 className="font-semibold">{item.title}</h3>
-      </div>
-    </td>
-    <td className="hidden md:table-cell">{item.class?.name || "-"}</td>
-    <td className="hidden md:table-cell"> {new Intl.DateTimeFormat("en-US").format(item.date)}</td>
-    <td>
-      <div className="flex items-center gap-2">
-        {role === "admin" && (
-          <>
-          <FormModal table="announcement" type="update" data={item}/>
-          <FormModal table="announcement" type="delete" id={item.id}/>
-
-          </>
-        )}
-      </div>
-    </td>
-  </tr>
-);
-
-const columns = [
-{
-  header: "Title",
-  accessor: "title",
-  className: "",
-
-},
-{
-  header: "Class",
-  accessor: "class",
-  className: "",
-},
-
-{
-  header: "Date",
-  accessor: "date",
-  className: "hidden lg:table-cell",
-},
-...(role === "admin"
-  ? [
-      {
-        header: "Actions",
-        accessor: "action",
-      },
-    ]
-  : []),
-];
 
 const EventsListPage = async ({
   searchParams,
 }: {
   searchParams: { [key: string]: string | undefined };
 }) => {
- 
- 
+  const {userId,sessionClaims } = auth();
+  const role = (sessionClaims?.metadata as { role?: string })?.role;
+  const currnetUserId=userId!;
+  const renderRow = (item: announcementList) => (
+    <tr
+      key={item.id}
+      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-[#F1F0FF]"
+    >
+      <td className="flex items-center gap-4 p-4">
+        <div className="flex flex-col">
+          <h3 className="font-semibold">{item.title}</h3>
+        </div>
+      </td>
+      <td className="hidden md:table-cell">{item.class?.name || "-"}</td>
+      <td className="hidden md:table-cell"> {new Intl.DateTimeFormat("en-US").format(item.date)}</td>
+      <td>
+        <div className="flex items-center gap-2">
+          {role === "admin" && (
+            <>
+            <FormContaier table="announcement" type="update" data={item}/>
+            <FormContaier table="announcement" type="delete" id={item.id}/>
+  
+            </>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+  
+  const columns = [
+  {
+    header: "Title",
+    accessor: "title",
+    className: "",
+  
+  },
+  {
+    header: "Class",
+    accessor: "class",
+    className: "",
+  },
+  
+  {
+    header: "Date",
+    accessor: "date",
+    className: "hidden lg:table-cell",
+  },
+  ...(role === "admin"
+    ? [
+        {
+          header: "Actions",
+          accessor: "action",
+        },
+      ]
+    : []),
+  ];
+  
   const { page, ...queryParams } = searchParams;
 
   const p = page ? parseInt(page) : 1;
-  const {sessionClaims } = auth();
-  const role = (sessionClaims?.metadata as { role?: string })?.role;
 
 
   const query: Prisma.AnnouncementWhereInput = {};
@@ -135,7 +134,7 @@ const EventsListPage = async ({
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
             {role === "admin" && (
-              <FormModal table="announcement" type="create"/>
+              <FormContaier table="announcement" type="create"/>
             )}
           </div>
         </div>

@@ -1,71 +1,73 @@
 import Pagination from "@/app/component/comp/Pagination";
 import Table from "@/app/component/comp/Table";
 import TableSearch from "@/app/component/comp/TableSearch";
-import FormModal from "@/app/component/FormModals";
-import { role } from "@/lib/utils";
+import FormContaier from "@/app/component/comp/formContianer";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Class, Lesson, Prisma, Subject, Teacher } from "@prisma/client";
 import Image from "next/image";
+import { auth } from "@clerk/nextjs/server";
 
 type LessonList = Lesson & { subject: Subject } & { class: Class } & {
   teacher: Teacher;
 };
-const renderRow = (item: LessonList) => (
-  <tr
-    key={item.id}
-    className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
-  >
-    <td className="flex items-center gap-4 p-4">{item.subject.name}</td>
-    <td>{item.class.name}</td>
-    <td className="hidden md:table-cell">
-      {item.teacher.name + " " + item.teacher.surname}
-    </td>
-    <td>
-      <div className="flex items-center gap-2">
-        {role === "admin" && (
-          <>
-            <FormModal table="lesson" type="update" data={item} />
-            <FormModal table="lesson" type="delete" id={item.id} />
-          </>
-        )}
-      </div>
-    </td>
-  </tr>
-);
-const columns = [
-  {
-    header: "Subject Name",
-    accessor: "name",
-  },
-  {
-    header: "Class",
-    accessor: "class",
-  },
-  {
-    header: "Teacher",
-    accessor: "teacher",
-    className: "hidden md:table-cell",
-  },
-  ...(role === "admin"
-    ? [
-        {
-          header: "Actions",
-          accessor: "action",
-        },
-      ]
-    : []),
-];
+
+
 const LessonListPage = async ({
   searchParams,
 }: {
   searchParams: { [key: string]: string | undefined };
 }) => {
-
+  const {userId,sessionClaims } = auth();
+  const role = (sessionClaims?.metadata as { role?: string })?.role;
   const { page, ...queryParams } = searchParams;
-
   const p = page ? parseInt(page) : 1;
 
+  const renderRow = (item: LessonList) => (
+    <tr
+      key={item.id}
+      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
+    >
+      <td className="flex items-center gap-4 p-4">{item.subject.name}</td>
+      <td>{item.class.name}</td>
+      <td className="hidden md:table-cell">
+        {item.teacher.name + " " + item.teacher.surname}
+      </td>
+      <td>
+        <div className="flex items-center gap-2">
+          {role === "admin" && (
+            <>
+              <FormContaier table="lesson" type="update" data={item} />
+              <FormContaier table="lesson" type="delete" id={item.id} />
+            </>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+  const columns = [
+    {
+      header: "Subject Name",
+      accessor: "name",
+    },
+    {
+      header: "Class",
+      accessor: "class",
+    },
+    {
+      header: "Teacher",
+      accessor: "teacher",
+      className: "hidden md:table-cell",
+    },
+    ...(role === "admin"
+      ? [
+          {
+            header: "Actions",
+            accessor: "action",
+          },
+        ]
+      : []),
+  ];
   // URL PARAMS CONDITION
 
   const query: Prisma.LessonWhereInput = {};
@@ -121,7 +123,7 @@ const LessonListPage = async ({
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {role === "admin" && <FormModal table="lesson" type="create" />}
+            {role === "admin" && <FormContaier table="lesson" type="create" />}
           </div>
         </div>
       </div>

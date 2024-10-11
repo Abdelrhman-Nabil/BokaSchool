@@ -1,7 +1,8 @@
 import Announcements from "@/app/component/comp/Announcements "
 import BigCalendarContainer from "@/app/component/comp/bigCalendarContainer"
 import EventCalendarContainer from "@/app/component/comp/eventCalendarContainer";
-import { currnetUserId } from "@/lib/utils"
+import { auth } from "@clerk/nextjs/server";
+
 
 const TeacherPage=({
     searchParams,
@@ -9,7 +10,9 @@ const TeacherPage=({
     searchParams: { [keys: string]: string | undefined };
   }) => {
   
-
+    const {userId,sessionClaims } = auth();
+    const role = (sessionClaims?.metadata as { role?: string })?.role;
+    const currnetUserId=userId!;
     return(
         <div className=" flex-1 p-4 flex gap-4 flex-col xl:flex-row">
                {/* {left} */}

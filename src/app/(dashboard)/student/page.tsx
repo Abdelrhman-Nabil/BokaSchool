@@ -2,14 +2,16 @@ import Announcements from "@/app/component/comp/Announcements "
 import BigCalendarContainer from "@/app/component/comp/bigCalendarContainer"
 import EventCalendarContainer from "@/app/component/comp/eventCalendarContainer"
 import prisma from "@/lib/prisma"
-import { currnetUserId } from "@/lib/utils"
+import { auth } from "@clerk/nextjs/server"
 
 const StudentPage=async ({
     searchParams,
   }: {
     searchParams: { [keys: string]: string | undefined };
   }) => {
-  
+    const {userId,sessionClaims } = auth();
+    const role = (sessionClaims?.metadata as { role?: string })?.role;
+    const currnetUserId=userId!;
     const classItem=await prisma.class.findMany({
         where:{
             students:{some:{id:currnetUserId!}}

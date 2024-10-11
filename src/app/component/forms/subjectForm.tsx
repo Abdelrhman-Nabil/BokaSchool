@@ -2,13 +2,13 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { subjectSchema, SubjectSchema } from "@/lib/formValidationSchemas";
-import { createSubject, updateSubject } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import InputField from "../comp/inputField";
+import { subjectSchema, SubjectSchema } from "@/lib/formValidationSchemas";
+import { createSubject, updateSubject } from "@/lib/actions";
 
 const SubjectForm = ({
   setOpen,
@@ -66,7 +66,7 @@ const SubjectForm = ({
       <div className="flex justify-between flex-wrap gap-4">
         <InputField
           label="Subject name"
-          name="name"
+          name="surname"
           defaultValue={data?.name}
           register={register}
           error={errors?.name}
